@@ -17,7 +17,7 @@ func New(log *log.Logger) (plesk Plesk, err error) {
 		Log: log,
 	}
 
-	//plesk.Config, err = plesk.getSettings()
+	plesk.Config, err = plesk.getSettings()
 	return
 }
 
