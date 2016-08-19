@@ -17,7 +17,7 @@ type Dump struct {
     Name string `xml:"name,attr"`
     Fullname string `xml:"fullname,attr"`
     CreationDate string `xml:"creation-date,attr"`
-    Size int `xml:"size,attr"`
+    Size int64 `xml:"size,attr"`
     IsFull bool `xml:"isFull,attr"`
     Description string `xml:"description,attr"`
     OwnerGuid string `xml:"owner-guid,attr"`
@@ -27,7 +27,7 @@ type Dump struct {
     DumpOriginalVersion string `xml:"dump-original-version,attr"`
     DumpFormat string `xml:"dump-format,attr"`
     ContentIncluded bool `xml:"content-included,attr"`
-    IncrementBase int `xml:"increment-base,attr"`
+    IncrementBase int64 `xml:"increment-base,attr"`
     IncrementBaseFullname string `xml:"increment-base-fullname,attr"`
 }
 
