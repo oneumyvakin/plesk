@@ -22,7 +22,7 @@ func New(log *log.Logger) (plesk Plesk, err error) {
 }
 
 func execute(log *log.Logger, command string, args ...string) (output string, outputBytes []byte, code int, err error) {
-	//log.Printf("%s %s", command, args)
+	log.Printf("%s %s", command, args)
 
 	cmd := exec.Command(command, args...)
 	var waitStatus syscall.WaitStatus
@@ -40,9 +40,8 @@ func execute(log *log.Logger, command string, args ...string) (output string, ou
 	}
 
 	output = string(outputBytes)
-	if err != nil {
-		log.Println("output: ", output, "err: ", err, "code: ", code)
-	}
+
+	log.Println("output: ", output, "err: ", err, "code: ", code)
 
 	return
 }

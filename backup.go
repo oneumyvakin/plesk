@@ -128,15 +128,20 @@ func (self Plesk) ExportBackupFromLocalStorage(name, dstPath string) (error) {
 }
 
 // Import backup from tar file
-func (self Plesk) ImportBackupToLocalStorage(filePath, backupPassword string) (error) {
-    _, _, _, err := execute(
-        self.Log,
-        self.Config["pmm-ras"],
+func (self Plesk) ImportBackupToLocalStorage(filePath, backupPassword string, checkSign bool) (error) {
+    args := []string{
         "--import-file-as-dump",
         "--dump-file-specification=" + filePath,
         "--dump-storage=" + self.Config["DUMP_D"],
-        "--check-sign",
         "--force",
+    }
+    if checkSign {
+        args = append(args, "--check-sign")
+    }
+    _, _, _, err := execute(
+        self.Log,
+        self.Config["pmm-ras"],
+        args...
     )
     // --type=server --session-path=/var/log/plesk/PMM
     if err != nil {
