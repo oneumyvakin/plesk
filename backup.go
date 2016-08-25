@@ -5,6 +5,34 @@ import (
     "fmt"
 )
 
+const (
+    returnCodeOk int = 0
+    returnCodeError int = 1
+    returnCodeNotSupported int = 2
+
+    returnCodeImportedExist  int = 111
+    returnCodeImportedObjectNotMatch int  = 112
+    returnCodeImportWrongPassword int  = 113
+    returnCodeImportDeprecatedDumpVersion int  = 114
+    returnCodeImportWinNativeMailContentSkipped int  = 115
+    returnCodeImportErrorSign int  = 116
+    returnCodeImportNotWellFormedXml int  = 117
+    returnCodeImportDenied int  = 118
+
+    returnCodeTransportPermissionDenied int  = 121
+    returnCodeTransportWrongPassword int  = 122
+    returnCodeTransportWrongLogin  int = 123
+    returnCodeTransportResolveHost int  = 124
+    returnCodeTransportUnableConnect int  = 125
+    returnCodeTransportNetworkError  int = 126
+    returnCodeTransportFileNotExist  int = 127
+
+    returnCodeRepoDumpNotExist  int = 151
+    returnCodeRepoBadDump  int = 152
+    returnCodeRepoDumpExist  int = 153
+    returnCodeRepoPathTooLong int  = 154
+)
+
 type DumpList struct {
     DumpList []Dump `xml:"dump"`
 }
@@ -134,18 +162,28 @@ func (self Plesk) ImportBackupToLocalStorage(filePath, backupPassword string, ch
         "--dump-file-specification=" + filePath,
         "--dump-storage=" + self.Config["DUMP_D"],
         "--force",
+        // --type=server --session-path=/var/log/plesk/PMM
     }
     if checkSign {
         args = append(args, "--check-sign")
     }
-    _, _, _, err := execute(
+
+    _, _, code, err := execute(
         self.Log,
         self.Config["pmm-ras"],
         args...
     )
-    // --type=server --session-path=/var/log/plesk/PMM
+
     if err != nil {
-        return fmt.Errorf("Failed to import backup file %s to dump storage %s with error: %s\n", filePath, self.Config["DUMP_D"], err)
+        returnErr := fmt.Errorf("Failed to import backup file %s to dump storage %s with error: %s\n", filePath, self.Config["DUMP_D"], err)
+        switch code {
+        case returnCodeImportErrorSign:
+            if !checkSign {
+                break
+            }
+        default:
+            return returnErr
+        }
     }
 
     self.Log.Println("Successfully import backup file %s", filePath)
