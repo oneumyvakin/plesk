@@ -189,3 +189,20 @@ func (self Plesk) ImportBackupToLocalStorage(filePath, backupPassword string, ch
     self.Log.Println("Successfully import backup file %s", filePath)
     return nil
 }
+
+// Delete backup in local storage
+func (self Plesk) DeleteBackupFromLocalStorage(name string) (error) {
+    _, _, _, err := execute(
+        self.Log,
+        self.Config["pmm-ras"],
+        "--delete-dump",
+        "--dump-specification=" + name,
+        "--dump-storage=" + self.Config["DUMP_D"],
+    )
+    if err != nil {
+        return fmt.Errorf("Failed to delete backup %s: %s\n", name, err)
+    }
+
+    self.Log.Println("Successfully delete backup %s", name)
+    return nil
+}
