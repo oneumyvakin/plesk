@@ -145,8 +145,22 @@ func (self Plesk) GetBackupListFromLocalStorage() ([]Dump, error) {
 }
 
 // Export backup as tar file
-func (self Plesk) ExportBackupFromLocalStorage(name, dstPath string) (error) {
-    _, _, _, err := execute(self.Log, self.Config["pmm-ras"], "--export-dump-as-file", "--dump-specification=" + name, "--dump-file-specification=" + dstPath, "--include-increments")
+func (self Plesk) ExportBackupFromLocalStorage(name, dstPath string, includeIncrements bool) (error) {
+    args := []string{
+        "--export-dump-as-file",
+        "--dump-specification=" + name,
+        "--dump-file-specification=" + dstPath,
+    }
+    if includeIncrements {
+        args = append(args, "--include-increments")
+    }
+    
+    _, _, _, err := execute(
+        self.Log,
+        self.Config["pmm-ras"],
+        args...
+    )
+    
     if err != nil {
         return fmt.Errorf("Failed to export backup %s to %s: %s\n", name, dstPath, err)
     }
