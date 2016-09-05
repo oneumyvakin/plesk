@@ -31,7 +31,7 @@ func (self Plesk) getSettings() (settings map[string]string, err error) {
 
 func (self Plesk) getSettingsFromPsaConf() (settings map[string]string, err error) {
 	settings = make(map[string]string)
-	pattern := regexp.MustCompile("^([^#].+) (.+)$")
+	pattern := regexp.MustCompile("^([^#].+)\\s(.+)$")
 
 	input, err := ioutil.ReadFile(psaConf)
 	if err != nil {
