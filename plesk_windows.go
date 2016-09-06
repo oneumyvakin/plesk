@@ -24,10 +24,11 @@ func (self Plesk) getSettings() (settings map[string]string, err error) {
 	for key, val := range psaConfSettings {
 		settings[key] = val
 	}
-
+    
+    settings["DUMP_TMP_D"] = settings["DumpTempDir"] // Unification with Linux
     settings["ADMIN_BIN"] = filepath.Join(settings["PRODUCT_ROOT_D"], "admin", "bin")
     settings["pmm-ras"] = filepath.Join(settings["ADMIN_BIN"], "pmm-ras")
-
+            
 	return
 }
 
