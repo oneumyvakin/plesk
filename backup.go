@@ -35,30 +35,31 @@ const (
 )
 
 var PleskBackupReturnCode = map[int]string{
-    0: "returnCodeOk",
-    1: "returnCodeError",
+    BackupReturnCodeOk: "returnCodeOk",
+    BackupReturnCodeError: "returnCodeError",
+    BackupReturnCodeNotSupported: "returnCodeNotSupported",
     
-    111: "returnCodeImportedExist",
-    112: "returnCodeImportedObjectNotMatch",
-    113: "returnCodeImportWrongPassword",
-    114: "returnCodeImportDeprecatedDumpVersion",
-    115: "returnCodeImportWinNativeMailContentSkipped",
-    116: "returnCodeImportErrorSign",
-    117: "returnCodeImportNotWellFormedXml",
-    118: "returnCodeImportDenied",
+    BackupReturnCodeImportedExist: "returnCodeImportedExist",
+    BackupReturnCodeImportedObjectNotMatch: "returnCodeImportedObjectNotMatch",
+    BackupReturnCodeImportWrongPassword: "returnCodeImportWrongPassword",
+    BackupReturnCodeImportDeprecatedDumpVersion: "returnCodeImportDeprecatedDumpVersion",
+    BackupReturnCodeImportWinNativeMailContentSkipped: "returnCodeImportWinNativeMailContentSkipped",
+    BackupReturnCodeImportErrorSign: "returnCodeImportErrorSign",
+    BackupReturnCodeImportNotWellFormedXml: "returnCodeImportNotWellFormedXml",
+    BackupReturnCodeImportDenied: "returnCodeImportDenied",
     
-    121: "returnCodeTransportPermissionDenied",
-    122: "returnCodeTransportWrongPassword",
-    123: "returnCodeTransportWrongLogin",
-    124: "returnCodeTransportResolveHost",
-    125: "returnCodeTransportUnableConnect",
-    126: "returnCodeTransportNetworkError",
-    127: "returnCodeTransportFileNotExist",
+    BackupReturnCodeTransportPermissionDenied: "returnCodeTransportPermissionDenied",
+    BackupReturnCodeTransportWrongPassword: "returnCodeTransportWrongPassword",
+    BackupReturnCodeTransportWrongLogin: "returnCodeTransportWrongLogin",
+    BackupReturnCodeTransportResolveHost: "returnCodeTransportResolveHost",
+    BackupReturnCodeTransportUnableConnect: "returnCodeTransportUnableConnect",
+    BackupReturnCodeTransportNetworkError: "returnCodeTransportNetworkError",
+    BackupReturnCodeTransportFileNotExist: "returnCodeTransportFileNotExist",
     
-    151: "returnCodeRepoDumpNotExist",
-    152: "returnCodeRepoBadDump",
-    153: "returnCodeRepoDumpExist",
-    154: "returnCodeRepoPathTooLong",
+    BackupReturnCodeRepoDumpNotExist: "returnCodeRepoDumpNotExist",
+    BackupReturnCodeRepoBadDump: "returnCodeRepoBadDump",
+    BackupReturnCodeRepoDumpExist: "returnCodeRepoDumpExist",
+    BackupReturnCodeRepoPathTooLong: "returnCodeRepoPathTooLong",
 }
 
 type BackupErr struct {
