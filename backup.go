@@ -102,6 +102,7 @@ type DumpList struct {
 type Dump struct {
     //Inner tags
     DumpObject DumpObject `xml:"backup-object"`
+    DumpStatus DumpStatus `xml:"dump-status"`
 
     //Attributes
     Name string `xml:"name,attr"`
@@ -128,10 +129,41 @@ type DumpObject struct {
      Guid string `xml:"guid,attr"` // owner guid
 }
 
+type DumpStatus struct {
+     //Attributes
+     DumpStatus string `xml:"dump-status,attr"` // "OK"
+     BackupProcessStatus string `xml:"backup-process-status,attr"` // "ERROR" or "WARNINGS" or "SUCCESS"
+}
+
 func (self Plesk) GetBackupListFromLocalStorage() ([]Dump, error) {
     /*
     <?xml version="1.0" encoding="UTF-8"?>
     <dump-list>
+     <dump name="backup_info_1609042052_1609101705.xml" fullname="backup_info_1609042052_1609101705.xml" creation-date="1609101705" size="222300" isFull="true" description="All configuration and content" owner-guid="64110f72-f73f-4c2a-bd4c-c9ffaf40b75f" owner-type="server" verification-string="" encryption-type="" dump-version="17.0.15" dump-original-version="17.0.15" dump-format="panel" content-included="true" increment-base="1609042052" increment-base-fullname="backup_info_1609042052.xml">
+      <backup-object type="server" name="admin" guid="64110f72-f73f-4c2a-bd4c-c9ffaf40b75f"/>
+      <dump-status dump-status="OK" backup-process-status="ERROR">
+       <details>
+        <message>backup_info_1609042052_1609101705.xml: </message>
+       </details>
+      </dump-status>
+      <related-dumps>
+       <related-dump>1609042052</related-dump>
+       <related-dump>1609050158</related-dump>
+      </related-dumps>
+      <dump-result></dump-result>
+     </dump>
+      <dump name="backup_info_1609042052_1609050158.xml" fullname="backup_info_1609042052_1609050158.xml" creation-date="1609050158" size="18101729" isFull="true" description="All configuration and content" owner-guid="64110f72-f73f-4c2a-bd4c-c9ffaf40b75f" owner-type="server" verification-string="$AES-128-CBC$ZywWvHjz1MZpIaaHwYM2Aw==$C6gbYwAtRp0Otl1JJEmMbN2k1dAzYa8Ts+ulqFIpy3Q=" encryption-type="panel-key" dump-version="17.0.15" dump-original-version="17.0.15" dump-format="panel" content-included="true" increment-base="1609042052" increment-base-fullname="backup_info_1609042052.xml">
+      <backup-object type="server" name="admin" guid="64110f72-f73f-4c2a-bd4c-c9ffaf40b75f"/>
+      <dump-status dump-status="OK" backup-process-status="WARNINGS">
+       <details>
+        <message>backup_info_1609042052_1609050158.xml: </message>
+       </details>
+      </dump-status>
+      <related-dumps>
+       <related-dump>1609042052</related-dump>
+      </related-dumps>
+      <dump-result></dump-result>
+     </dump>
      <dump name="backup_info_1605120057.xml" fullname="backup_info_1605120057.xml" creation-date="1605120057" size="50997425" isFull="true" description="п²п╟я│я┌я─п╬п╧п╨п╦ п╦ п╨п╬пҐя┌п╣пҐя┌ я│п╣я─п╡п╣я─п╟" owner-guid="df70004e-c33a-4b9d-8317-0748c2256303" owner-type="server" verification-string="$AES-128-CBC$r2S+Eyk0B6nhBPOfkGdRPw==$pFXWFU1UC+cOqjy788Fyu8ndOS1iNlrZEDjSTp2nl5U=" encryption-type="panel-key" dump-original-version="12.5.30" dump-format="panel" content-included="true">
       <backup-object type="server" name="admin" guid="df70004e-c33a-4b9d-8317-0748c2256303"/>
       <dump-status dump-status="OK" backup-process-status="SUCCESS">
