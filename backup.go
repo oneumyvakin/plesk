@@ -236,12 +236,12 @@ func (self Plesk) GetBackupListFromLocalStorage() ([]Dump, error) {
         return nil, fmt.Errorf("Failed to get backup list: Failed to parse xml: %s\n", err)
     }
     
-    for _, dump := range dumpList.DumpList {
-        rfc3339, err := self.BackupDateToRFC3339(dump.CreationDate)
+    for i, _ := range dumpList.DumpList {
+        rfc3339, err := self.BackupDateToRFC3339(dumpList.DumpList[i].CreationDate)
         if err != nil {
-            return fmt.Errorf("Failed to parse date: %s", err)
+            return nil, fmt.Errorf("Failed to parse date: %s", err)
         }
-        dump.CreationDate = rfc3339
+        dumpList.DumpList[i].CreationDate = rfc3339
     }
 
     self.Log.Printf("Successfully get backup list %#v\n", dumpList.DumpList)
