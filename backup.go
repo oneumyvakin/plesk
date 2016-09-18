@@ -4,6 +4,8 @@ import (
     "encoding/xml"
     "fmt"
     "strconv"
+    "time"
+    "regexp"
 )
 
 const (
@@ -233,6 +235,14 @@ func (self Plesk) GetBackupListFromLocalStorage() ([]Dump, error) {
     if err != nil {
         return nil, fmt.Errorf("Failed to get backup list: Failed to parse xml: %s\n", err)
     }
+    
+    for _, dump := range dumpList.DumpList {
+        rfc3339, err := self.BackupDateToRFC3339(dump.CreationDate)
+        if err != nil {
+            return fmt.Errorf("Failed to parse date: %s", err)
+        }
+        dump.CreationDate = rfc3339
+    }
 
     self.Log.Printf("Successfully get backup list %#v\n", dumpList.DumpList)
     return dumpList.DumpList, err
@@ -342,4 +352,24 @@ func (self Plesk) DeleteBackupFromLocalStorage(name string) (error) {
 
     self.Log.Println("Successfully delete backup %s", name)
     return nil
+}
+
+// Format date from 1607160958 to 2016-07-16 09:58:00 +0000 UTC
+func (self Plesk) BackupDateToRFC3339(date string) (string, error) {
+    datePartsStrings := regexp.MustCompile("\\d{2}").FindAllString (date, -1)
+    if len(datePartsStrings) != 5 {
+        return date, fmt.Errorf("Failed to convert date %s to RFC3339. Format must be like 1607160958", date)
+    }
+    dateParts := make([]int, 5)
+    for i, part := range datePartsStrings {
+        partInt, err := strconv.Atoi(part)
+        if err != nil {
+            return date, err
+        }
+         
+        dateParts[i] = partInt
+    }
+
+    t := time.Date(2000 + dateParts[0], time.Month(dateParts[1]), dateParts[2], dateParts[3], dateParts[4], 0, 0, time.Local)
+    return t.String(), nil
 }
