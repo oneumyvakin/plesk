@@ -90,7 +90,7 @@ func (e BackupErr) LocaleKey() string {
 func (e BackupErr) LocaleArgs() map[string]string {
 	return e.localeArgs
 }
-func (e BackupErr) Wrap(err error) BackupErr {
+func (e BackupErr) Wrap(err error) error {
     e.message = err.Error() + ": " + e.message
     e.localeArgs["err"] = err.Error() + ": " + e.localeArgs["err"]
 	return e
