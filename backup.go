@@ -37,36 +37,36 @@ const (
 )
 
 var PleskBackupReturnCode = map[int]string{
-    BackupReturnCodeOk: "returnCodeOk",
-    BackupReturnCodeError: "returnCodeError",
-    BackupReturnCodeNotSupported: "returnCodeNotSupported",
+    BackupReturnCodeOk: "PleskBackupReturnCodeOk",
+    BackupReturnCodeError: "PleskBackupReturnCodeError",
+    BackupReturnCodeNotSupported: "PleskBackupReturnCodeNotSupported",
     
-    BackupReturnCodeImportedExist: "returnCodeImportedExist",
-    BackupReturnCodeImportedObjectNotMatch: "returnCodeImportedObjectNotMatch",
-    BackupReturnCodeImportWrongPassword: "returnCodeImportWrongPassword",
-    BackupReturnCodeImportDeprecatedDumpVersion: "returnCodeImportDeprecatedDumpVersion",
-    BackupReturnCodeImportWinNativeMailContentSkipped: "returnCodeImportWinNativeMailContentSkipped",
-    BackupReturnCodeImportErrorSign: "returnCodeImportErrorSign",
-    BackupReturnCodeImportNotWellFormedXml: "returnCodeImportNotWellFormedXml",
-    BackupReturnCodeImportDenied: "returnCodeImportDenied",
+    BackupReturnCodeImportedExist: "PleskBackupReturnCodeImportedExist",
+    BackupReturnCodeImportedObjectNotMatch: "PleskBackupReturnCodeImportedObjectNotMatch",
+    BackupReturnCodeImportWrongPassword: "PleskBackupReturnCodeImportWrongPassword",
+    BackupReturnCodeImportDeprecatedDumpVersion: "PleskBackupReturnCodeImportDeprecatedDumpVersion",
+    BackupReturnCodeImportWinNativeMailContentSkipped: "PleskBackupReturnCodeImportWinNativeMailContentSkipped",
+    BackupReturnCodeImportErrorSign: "PleskBackupReturnCodeImportErrorSign",
+    BackupReturnCodeImportNotWellFormedXml: "PleskBackupReturnCodeImportNotWellFormedXml",
+    BackupReturnCodeImportDenied: "PleskBackupReturnCodeImportDenied",
     
-    BackupReturnCodeTransportPermissionDenied: "returnCodeTransportPermissionDenied",
-    BackupReturnCodeTransportWrongPassword: "returnCodeTransportWrongPassword",
-    BackupReturnCodeTransportWrongLogin: "returnCodeTransportWrongLogin",
-    BackupReturnCodeTransportResolveHost: "returnCodeTransportResolveHost",
-    BackupReturnCodeTransportUnableConnect: "returnCodeTransportUnableConnect",
-    BackupReturnCodeTransportNetworkError: "returnCodeTransportNetworkError",
-    BackupReturnCodeTransportFileNotExist: "returnCodeTransportFileNotExist",
+    BackupReturnCodeTransportPermissionDenied: "PleskBackupReturnCodeTransportPermissionDenied",
+    BackupReturnCodeTransportWrongPassword: "PleskBackupReturnCodeTransportWrongPassword",
+    BackupReturnCodeTransportWrongLogin: "PleskBackupReturnCodeTransportWrongLogin",
+    BackupReturnCodeTransportResolveHost: "PleskBackupReturnCodeTransportResolveHost",
+    BackupReturnCodeTransportUnableConnect: "PleskBackupReturnCodeTransportUnableConnect",
+    BackupReturnCodeTransportNetworkError: "PleskBackupReturnCodeTransportNetworkError",
+    BackupReturnCodeTransportFileNotExist: "PleskBackupReturnCodeTransportFileNotExist",
     
-    BackupReturnCodeRepoDumpNotExist: "returnCodeRepoDumpNotExist",
-    BackupReturnCodeRepoBadDump: "returnCodeRepoBadDump",
-    BackupReturnCodeRepoDumpExist: "returnCodeRepoDumpExist",
-    BackupReturnCodeRepoPathTooLong: "returnCodeRepoPathTooLong",
+    BackupReturnCodeRepoDumpNotExist: "PleskBackupReturnCodeRepoDumpNotExist",
+    BackupReturnCodeRepoBadDump: "PleskBackupReturnCodeRepoBadDump",
+    BackupReturnCodeRepoDumpExist: "PleskBackupReturnCodeRepoDumpExist",
+    BackupReturnCodeRepoPathTooLong: "PleskBackupReturnCodeRepoPathTooLong",
 }
 
 type BackupErr struct {
     isError    bool
-	code       int
+	code       string
 	message    string
 	localeKey  string
 	localeArgs map[string]string
@@ -79,7 +79,7 @@ func (e BackupErr) IsError() bool {
 	return e.isError
 }
 func (e BackupErr) Code() string {
-	return strconv.Itoa(e.code)
+	return e.code
 }
 func (e BackupErr) Message() string {
 	return e.message
@@ -259,7 +259,7 @@ func (self Plesk) ExportBackupFromLocalStorage(name, dstPath string, includeIncr
         args = append(args, "--include-increments")
     }
     
-    _, _, code, err := execute(
+    _, _, exitCode, err := execute(
         self.Log,
         self.Config["pmm-ras"],
         args...
@@ -268,9 +268,9 @@ func (self Plesk) ExportBackupFromLocalStorage(name, dstPath string, includeIncr
     if err != nil {
         return BackupErr{
             isError:    true,
-            code:       code,
+            code:       self.GetBackupErrorCode(exitCode),
             message:    fmt.Sprintf("Failed to export backup %s to %s: %s\n", name, dstPath, err),
-            localeKey:  PleskBackupReturnCode[code],
+            localeKey:  PleskBackupReturnCode[exitCode],
             localeArgs: map[string]string {
                 "backupName": name,
                 "dstPath": dstPath,
@@ -295,26 +295,26 @@ func (self Plesk) ImportBackupToLocalStorage(filePath, backupPassword string, ch
         args = append(args, "--check-sign")
     }
 
-    _, _, code, err := execute(
+    _, _, exitCode, err := execute(
         self.Log,
         self.Config["pmm-ras"],
         args...
     )
-
+    
     if err != nil {
         returnErr := BackupErr{
             isError:    true,
-            code:       code,
+            code:       self.GetBackupErrorCode(exitCode),
             message:    fmt.Sprintf("Failed to import backup file %s to dump storage %s with error: %s\n", filePath, self.Config["DUMP_D"], err),
-            localeKey:  PleskBackupReturnCode[code],
+            localeKey:  PleskBackupReturnCode[exitCode],
             localeArgs: map[string]string {
                 "filePath": filePath,
                 "dumpD": self.Config["DUMP_D"],
                 "checkSign": strconv.FormatBool(checkSign),
             },
         }
-        switch PleskBackupReturnCode[code] {
-        case "returnCodeImportErrorSign":
+        switch exitCode {
+        case BackupReturnCodeImportErrorSign:
             if !checkSign {
                 break
             }
@@ -329,7 +329,7 @@ func (self Plesk) ImportBackupToLocalStorage(filePath, backupPassword string, ch
 
 // Delete backup in local storage
 func (self Plesk) DeleteBackupFromLocalStorage(name string) (error) {
-    _, _, code, err := execute(
+    _, _, exitCode, err := execute(
         self.Log,
         self.Config["pmm-ras"],
         "--delete-dump",
@@ -339,9 +339,9 @@ func (self Plesk) DeleteBackupFromLocalStorage(name string) (error) {
     if err != nil {
         return BackupErr{
             isError:    true,
-            code:       code,
+            code:       self.GetBackupErrorCode(exitCode),
             message:    fmt.Sprintf("Failed to delete backup %s: %s\n", name, err),
-            localeKey:  PleskBackupReturnCode[code],
+            localeKey:  PleskBackupReturnCode[exitCode],
             localeArgs: map[string]string {
                 "backupName": name,
                 "dumpD": self.Config["DUMP_D"],
@@ -372,4 +372,13 @@ func (self Plesk) BackupDateToRFC3339(date string) (string, error) {
 
     t := time.Date(2000 + dateParts[0], time.Month(dateParts[1]), dateParts[2], dateParts[3], dateParts[4], 0, 0, time.Local)
     return t.String(), nil
+}
+
+func (self Plesk) GetBackupErrorCode(exitCode int) (errCode string) {
+    if code, ok := PleskBackupReturnCode[exitCode]; ok {
+        errCode = code
+    } else {
+        errCode = "PleskBackupReturnCodeUnknown"
+    }
+    return
 }
